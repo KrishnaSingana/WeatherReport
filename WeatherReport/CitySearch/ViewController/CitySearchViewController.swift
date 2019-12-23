@@ -14,16 +14,22 @@ class CitySearchViewController: UIViewController {
     
     // This is used for searching for particular healthCenter from the list.
     let searchController = UISearchController(searchResultsController: nil)
-
+    let connectionManagerInstance = ConnectionManager.sharedInstance
+    
+    fileprivate var citiesArray = [City]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpSearchController()
+        self.citiesTableView.isHidden = true
+        
     }
 
     private func setUpSearchController() {
         searchController.searchResultsUpdater = self as UISearchResultsUpdating
         searchController.searchBar.delegate = self as UISearchBarDelegate
-        searchController.searchBar.placeholder = "Search Cities"
+        searchController.searchBar.placeholder = "Search Cities (enter min 4 char to start search)"
+        searchController.searchBar.searchTextField.font = UIFont.systemFont(ofSize: 14)
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self
 
@@ -42,7 +48,7 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return citiesArray.count
     }
         
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -59,8 +65,13 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
         if cell == nil {
             cell = UITableViewCell(style: UITableViewCell.CellStyle.default, reuseIdentifier: "Cell")
         }
-
-        cell!.textLabel?.text = "Bangalore"
+        cell?.accessoryType = .disclosureIndicator
+        
+        let city = citiesArray[indexPath.row]
+        let cityName = city.areaName?[0].value ?? ""
+        let country = city.country?[0].value ?? ""
+        
+        cell!.textLabel?.text = "\(cityName), \(country)"
         return cell!
     }
 
@@ -73,7 +84,12 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
 extension CitySearchViewController : UISearchBarDelegate {
     // Called when keyboard search button pressed
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-
+        guard let searchText = searchBar.text else {
+            return
+        }
+        if searchText.count > 3 {
+            self.getPollutionDetailsForText(searchText: searchText)
+        }
     }
 }
 
@@ -84,3 +100,40 @@ extension CitySearchViewController: UISearchResultsUpdating {
     }
 }
 
+extension CitySearchViewController {
+        fileprivate func getPollutionDetailsForText(searchText : String) {
+            Common.sharedCommonInstance.showIndicatorViewOnScreen(viewController: self)
+            let defaultSession = URLSession(configuration: .default)
+            
+            let dataTask = defaultSession.dataTask(with:  connectionManagerInstance.getPollutionApiRequestWithSearchText(searchText: searchText)!) { data, response , error in
+                if (response as? HTTPURLResponse)?.statusCode == 200 {
+                    guard let citiesData = data else { return }
+                    do {
+                        let citiesList = try JSONDecoder().decode(SearchAPI.self, from: citiesData)
+                        self.parseCitiesWith(citiesList)
+                    } catch {
+                        print("JSON Data Parsing Error : \(error)")
+                    }
+                } else {
+                    Common.sharedCommonInstance.showAlertWith("", "City not found. Search for different city.", onScreen: self)
+                }
+                Common.sharedCommonInstance.hideIndicatorViewOnScreen(viewController: self)
+            }
+            dataTask.resume()
+        }
+    
+    fileprivate func parseCitiesWith(_ resultData : SearchAPI) {
+        citiesArray.removeAll()
+        let count = resultData.searchApi?.citiesList?.count ?? 0
+        for index in 0..<count   {
+            let city = resultData.searchApi?.citiesList?[index]
+            citiesArray.append(city!)
+        }
+        DispatchQueue.main.async {[unowned self] in
+            self.citiesTableView.reloadData()
+            if self.citiesArray.count > 0 {
+                self.citiesTableView.isHidden = false
+            }
+        }
+    }
+}

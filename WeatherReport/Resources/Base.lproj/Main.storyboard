@@ -15,7 +15,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="XL8-8U-nT6">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="XL8-8U-nT6">
                                 <rect key="frame" x="0.0" y="88" width="414" height="808"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <connections>
@@ -26,10 +26,10 @@
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="XL8-8U-nT6" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="1yn-he-uMc"/>
-                            <constraint firstAttribute="bottom" secondItem="XL8-8U-nT6" secondAttribute="bottom" id="KxY-c6-jE7"/>
-                            <constraint firstItem="XL8-8U-nT6" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="dyx-Os-uGE"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="XL8-8U-nT6" secondAttribute="trailing" id="nnM-pv-FmH"/>
+                            <constraint firstItem="XL8-8U-nT6" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="4Kw-KW-sim"/>
+                            <constraint firstAttribute="bottom" secondItem="XL8-8U-nT6" secondAttribute="bottom" id="Fqp-Ky-eCa"/>
+                            <constraint firstItem="XL8-8U-nT6" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Ncc-Bk-df1"/>
+                            <constraint firstItem="XL8-8U-nT6" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="zUH-y2-BZ9"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
