@@ -20,6 +20,7 @@
 		9AA5DC1B23B0C9A20088676D /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA5DC1A23B0C9A20088676D /* Common.swift */; };
 		9AA5DC2223B0E2440088676D /* CityWeatherViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA5DC2123B0E2440088676D /* CityWeatherViewController.swift */; };
 		9AA5DC2423B1B8110088676D /* WeatherDetailsAnnonation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA5DC2323B1B8110088676D /* WeatherDetailsAnnonation.swift */; };
+		9AA5DC2623B1C7650088676D /* CityWeatherDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA5DC2523B1C7650088676D /* CityWeatherDetails.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 		9AA5DC1A23B0C9A20088676D /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		9AA5DC2123B0E2440088676D /* CityWeatherViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityWeatherViewController.swift; sourceTree = "<group>"; };
 		9AA5DC2323B1B8110088676D /* WeatherDetailsAnnonation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherDetailsAnnonation.swift; sourceTree = "<group>"; };
+		9AA5DC2523B1C7650088676D /* CityWeatherDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityWeatherDetails.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				9A68092823B0B496000C78A3 /* CityList.swift */,
+				9AA5DC2523B1C7650088676D /* CityWeatherDetails.swift */,
 			);
 			path = JsonModels;
 			sourceTree = "<group>";
@@ -358,6 +361,7 @@
 				9A68092523B0A3A5000C78A3 /* ConnectionManager.swift in Sources */,
 				9A6808F023B08822000C78A3 /* AppDelegate.swift in Sources */,
 				9A6808F223B08822000C78A3 /* SceneDelegate.swift in Sources */,
+				9AA5DC2623B1C7650088676D /* CityWeatherDetails.swift in Sources */,
 				9AA5DC2423B1B8110088676D /* WeatherDetailsAnnonation.swift in Sources */,
 				9AA5DC2223B0E2440088676D /* CityWeatherViewController.swift in Sources */,
 				9AA5DC1B23B0C9A20088676D /* Common.swift in Sources */,

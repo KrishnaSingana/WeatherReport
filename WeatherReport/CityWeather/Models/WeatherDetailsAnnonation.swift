@@ -11,13 +11,14 @@ import MapKit
 
 class WeatherDetailsAnnonation: NSObject, MKAnnotation {
     let currentWeatherImageUrl: String
-    let currentHumudity : Int
+    let currentHumudity : String
     let currentWeatherText : String
-    let currentTempC : Int
-    let currentTempF : Int
+    let currentTempC : String
+    let currentTempF : String
     let coordinate: CLLocationCoordinate2D
 
-    init(weatherImageUrl: String, currentHumudity: Int, currentWeatherText: String, currentTempC: Int, currentTempF: Int, coordinate: CLLocationCoordinate2D) {
+    init(weatherImageUrl: String, currentHumudity: String, currentWeatherText: String, currentTempC: String,
+         currentTempF: String, coordinate: CLLocationCoordinate2D) {
         self.currentWeatherImageUrl = weatherImageUrl
         self.currentHumudity = currentHumudity
         self.currentWeatherText = currentWeatherText

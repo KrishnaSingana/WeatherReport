@@ -101,7 +101,7 @@ extension CitySearchViewController : UISearchBarDelegate {
             return
         }
         if searchText.count > 3 {
-            self.getPollutionDetailsForText(searchText: searchText)
+            self.getListOfCitiesWith(searchText)
         }
     }
 }
@@ -114,11 +114,12 @@ extension CitySearchViewController: UISearchResultsUpdating {
 }
 
 extension CitySearchViewController {
-        fileprivate func getPollutionDetailsForText(searchText : String) {
+        fileprivate func getListOfCitiesWith(_ searchText : String) {
             Common.sharedCommonInstance.showIndicatorViewOnScreen(viewController: self)
             let defaultSession = URLSession(configuration: .default)
             
-            let dataTask = defaultSession.dataTask(with:  connectionManagerInstance.getPollutionApiRequestWithSearchText(searchText: searchText)!) { data, response , error in
+            let dataTask = defaultSession.dataTask(with: connectionManagerInstance.getCitySearchApiRequestWith(searchText)!)
+            { data, response , error in
                 if (response as? HTTPURLResponse)?.statusCode == 200 {
                     guard let citiesData = data else { return }
                     do {
@@ -128,7 +129,8 @@ extension CitySearchViewController {
                         print("JSON Data Parsing Error : \(error)")
                     }
                 } else {
-                    Common.sharedCommonInstance.showAlertWith("", "City not found. Search for different city.", onScreen: self)
+                    Common.sharedCommonInstance.showAlertWith("", "City not found. Search for different city.",
+                                                              onScreen: self)
                 }
                 Common.sharedCommonInstance.hideIndicatorViewOnScreen(viewController: self)
             }
