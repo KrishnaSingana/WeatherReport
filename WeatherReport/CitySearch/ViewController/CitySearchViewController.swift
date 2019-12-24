@@ -29,7 +29,7 @@ class CitySearchViewController: UIViewController {
     private func setUpSearchController() {
         searchController.searchResultsUpdater = self as UISearchResultsUpdating
         searchController.searchBar.delegate = self as UISearchBarDelegate
-        searchController.searchBar.placeholder = "Search Cities (enter min 4 char to start search)"
+        searchController.searchBar.placeholder = "Search Cities (enter min 3 char to start search)"
         searchController.searchBar.searchTextField.font = UIFont.systemFont(ofSize: 14)
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self
@@ -95,13 +95,22 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
 
 //MARK:- SerachBar Delegate Methods
 extension CitySearchViewController : UISearchBarDelegate {
-    // Called when keyboard search button pressed
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let searchText = searchBar.text else {
-            return
-        }
-        if searchText.count > 3 {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.count > 2 {
             self.getListOfCitiesWith(searchText)
+        } else {
+            self.clearCitiesArray()
+        }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        self.clearCitiesArray()
+    }
+    
+    fileprivate func clearCitiesArray() {
+        DispatchQueue.main.async {
+            self.citiesArray.removeAll()
+            self.citiesTableView.reloadData()
         }
     }
 }
@@ -115,10 +124,13 @@ extension CitySearchViewController: UISearchResultsUpdating {
 
 extension CitySearchViewController {
         fileprivate func getListOfCitiesWith(_ searchText : String) {
-            Common.sharedCommonInstance.showIndicatorViewOnScreen(viewController: self)
+            guard let apiRequest =  connectionManagerInstance.getCitySearchApiRequestWith(searchText) else {
+                return
+            }
+
             let defaultSession = URLSession(configuration: .default)
             
-            let dataTask = defaultSession.dataTask(with: connectionManagerInstance.getCitySearchApiRequestWith(searchText)!)
+            let dataTask = defaultSession.dataTask(with: apiRequest)
             { data, response , error in
                 if (response as? HTTPURLResponse)?.statusCode == 200 {
                     guard let citiesData = data else { return }
@@ -129,10 +141,12 @@ extension CitySearchViewController {
                         print("JSON Data Parsing Error : \(error)")
                     }
                 } else {
-                    Common.sharedCommonInstance.showAlertWith("", "City not found. Search for different city.",
-                                                              onScreen: self)
+                    DispatchQueue.main.async {
+                        self.searchController.searchBar.text = ""
+                        Common.sharedCommonInstance.showAlertWith("", "City not found. Search for different city.",
+                                                                  onScreen: self)
+                    }
                 }
-                Common.sharedCommonInstance.hideIndicatorViewOnScreen(viewController: self)
             }
             dataTask.resume()
         }
