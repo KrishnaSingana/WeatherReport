@@ -39,6 +39,8 @@ struct City: Codable {
     var country: [GenericModel]?
     var region: [GenericModel]?
     var weatherUrl: [GenericModel]?
+    var latitude: String?
+    var longitude: String?
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -47,6 +49,8 @@ struct City: Codable {
         country = try container.decodeIfPresent([GenericModel].self, forKey: .country)
         region = try container.decodeIfPresent([GenericModel].self, forKey: .region)
         weatherUrl = try container.decodeIfPresent([GenericModel].self, forKey: .weatherUrl)
+        latitude = try container.decodeIfPresent(String.self, forKey: .latitude)
+        longitude = try container.decodeIfPresent(String.self, forKey: .longitude)
     }
 }
 

@@ -36,11 +36,42 @@
                     <navigationItem key="navigationItem" title="Search Cities" id="sKZ-4D-l0o"/>
                     <connections>
                         <outlet property="citiesTableView" destination="XL8-8U-nT6" id="aAK-na-M1f"/>
+                        <segue destination="RVG-eg-ebs" kind="show" identifier="searchCityViewToCityWeatherViewSegue" id="M1R-rh-QYt"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1952.1739130434785" y="137.94642857142856"/>
+        </scene>
+        <!--City Weather-->
+        <scene sceneID="A9F-4C-gHY">
+            <objects>
+                <viewController storyboardIdentifier="CityWeatherViewController" id="RVG-eg-ebs" customClass="CityWeatherViewController" customModule="WeatherReport" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="gHZ-Ex-8Lt">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="F59-r0-op9">
+                                <rect key="frame" x="0.0" y="88" width="414" height="808"/>
+                            </mapView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="KRg-F5-j7H" firstAttribute="trailing" secondItem="F59-r0-op9" secondAttribute="trailing" id="1KB-KW-eBt"/>
+                            <constraint firstItem="F59-r0-op9" firstAttribute="top" secondItem="KRg-F5-j7H" secondAttribute="top" id="5di-8U-88H"/>
+                            <constraint firstItem="F59-r0-op9" firstAttribute="leading" secondItem="KRg-F5-j7H" secondAttribute="leading" id="CsP-2X-f1w"/>
+                            <constraint firstAttribute="bottom" secondItem="F59-r0-op9" secondAttribute="bottom" id="pER-Et-qUg"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="KRg-F5-j7H"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="City Weather" id="uEm-q9-F3Q"/>
+                    <connections>
+                        <outlet property="mapView" destination="F59-r0-op9" id="Tf5-tF-QQC"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="buD-L4-77e" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2790" y="138"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="he9-QX-gil">

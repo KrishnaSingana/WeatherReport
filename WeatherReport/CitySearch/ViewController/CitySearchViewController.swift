@@ -17,6 +17,7 @@ class CitySearchViewController: UIViewController {
     let connectionManagerInstance = ConnectionManager.sharedInstance
     
     fileprivate var citiesArray = [City]()
+    fileprivate var selectedCity: City!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -76,8 +77,20 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Selected")
+        selectedCity = citiesArray[indexPath.row]
+        self.performSegue(withIdentifier: "searchCityViewToCityWeatherViewSegue", sender: nil)
     }
+    
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "searchCityViewToCityWeatherViewSegue" {
+            let cityWeatherVC = segue.destination as? CityWeatherViewController
+            cityWeatherVC?.selectedCity = self.selectedCity
+        }
+    }
+
 }
 
 //MARK:- SerachBar Delegate Methods
