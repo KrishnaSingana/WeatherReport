@@ -142,31 +142,32 @@ extension CityWeatherViewController {
         weatherImage.backgroundColor = .clear
         annonationView.addSubview(weatherImage)
         
-        let weatherNameLbl = UILabel(frame: CGRect(x: 16, y: 150, width: 268, height: 40))
+        let weatherNameLbl = UILabel(frame: CGRect(x: 16, y: 150, width: 268, height: 80))
         weatherNameLbl.text = annonationObj.currentWeatherText
         weatherNameLbl.textAlignment = .center
-        weatherNameLbl.font = UIFont.boldSystemFont(ofSize: 30)
+        weatherNameLbl.font = UIFont.boldSystemFont(ofSize: 26)
         weatherNameLbl.textColor = .black
+        weatherNameLbl.numberOfLines = 2
         annonationView.addSubview(weatherNameLbl)
 
-        let tempatureImage = UIImageView(frame: CGRect(x: 24, y: 200, width: 30, height: 30))
+        let tempatureImage = UIImageView(frame: CGRect(x: 24, y: 230, width: 30, height: 30))
         tempatureImage.image = UIImage(named: "temparatureIcon")
         tempatureImage.backgroundColor = .clear
         annonationView.addSubview(tempatureImage)
 
-        let temperatureLbl = UILabel(frame: CGRect(x: 56, y: 200, width: 80, height: 30))
+        let temperatureLbl = UILabel(frame: CGRect(x: 56, y: 230, width: 80, height: 30))
         temperatureLbl.text = "\(annonationObj.currentTempC)°C"
         temperatureLbl.textAlignment = .left
         temperatureLbl.font = UIFont.systemFont(ofSize: 26)
         temperatureLbl.textColor = .black
         annonationView.addSubview(temperatureLbl)
 
-        let humidityImage = UIImageView(frame: CGRect(x: 174, y: 200, width: 30, height: 30))
+        let humidityImage = UIImageView(frame: CGRect(x: 174, y: 230, width: 30, height: 30))
         humidityImage.image = UIImage(named: "humidityImage")
         humidityImage.backgroundColor = .clear
         annonationView.addSubview(humidityImage)
 
-        let humidityLbl = UILabel(frame: CGRect(x: 210, y: 200, width: 80, height: 30))
+        let humidityLbl = UILabel(frame: CGRect(x: 210, y: 230, width: 80, height: 30))
         humidityLbl.text = "\(annonationObj.currentHumudity)%"
         humidityLbl.textAlignment = .left
         humidityLbl.font = UIFont.systemFont(ofSize: 26)

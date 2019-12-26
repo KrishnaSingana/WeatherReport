@@ -8,6 +8,8 @@
 
 import UIKit
 
+let CitiesUserDefaultsKey = "CitiesArrayKey"
+
 class CitySearchViewController: UIViewController {
 
     @IBOutlet weak var citiesTableView: UITableView!
@@ -22,10 +24,13 @@ class CitySearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpSearchController()
-        self.citiesTableView.isHidden = true
-        
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        self.searchController.isActive = false
+        self.retriveCitiesDataFromUserDefaults()
+    }
+    
     private func setUpSearchController() {
         searchController.searchResultsUpdater = self as UISearchResultsUpdating
         searchController.searchBar.delegate = self as UISearchBarDelegate
@@ -39,6 +44,74 @@ class CitySearchViewController: UIViewController {
         definesPresentationContext = true
     }
 
+    private func appendNewCityToUserDefaultsArrayWith(city : City) {
+        var citiesDataArray = UserDefaults.standard.array(forKey: CitiesUserDefaultsKey) as? [Data]
+        if citiesDataArray == nil {
+            let array : [Data] = []
+            citiesDataArray = array
+            UserDefaults.standard.setValue(citiesDataArray, forKey: CitiesUserDefaultsKey)
+        }
+        
+        let defaults = UserDefaults.standard
+        let data = try? PropertyListEncoder().encode(city)
+        guard let cityData = data else { return }
+        
+        let result = self.validateCityIsInUserDefaultsArrayWith(cityObj: city)
+        if result.1, let cityIndex = result.0 {
+            citiesDataArray?.remove(at: cityIndex)
+        }
+        if let count = citiesDataArray?.count, count >= 10 {
+            let _ = citiesDataArray?.remove(at: 0)
+        }
+        citiesDataArray?.append(cityData)
+        defaults.setValue(citiesDataArray, forKey: CitiesUserDefaultsKey)
+    }
+
+    private func validateCityIsInUserDefaultsArrayWith(cityObj : City) -> ( Int?, Bool) {
+        let defaults = UserDefaults.standard
+        let citiesDataArray = defaults.array(forKey: CitiesUserDefaultsKey) as? [Data]
+        guard let count = citiesDataArray?.count else { return (nil, false) }
+        for index in 0..<count {
+            let data = citiesDataArray?[index]
+            guard let cityData = data else { return (nil, false) }
+            // Use PropertyListDecoder to convert Data into Player
+            guard let city = try? PropertyListDecoder().decode(City.self, from: cityData) else {
+                return (nil, false)
+            }
+            if cityObj.latitude == city.latitude && cityObj.longitude == city.longitude {
+                return (index, true)
+            }
+        }
+        return (nil, false)
+    }
+    
+    private func retriveCitiesDataFromUserDefaults() {
+        var citiesArray = [City]()
+        let defaults = UserDefaults.standard
+        var citiesDataArray = defaults.array(forKey: CitiesUserDefaultsKey) as? [Data]
+        if citiesDataArray == nil {
+            let array : [Data] = []
+            citiesDataArray = array
+            defaults.setValue(citiesDataArray, forKey: CitiesUserDefaultsKey)
+        }
+        guard let count = citiesDataArray?.count else { return }
+        for index in 0..<count {
+            let data = citiesDataArray?[index]
+            guard let cityData = data else { return}
+            // Use PropertyListDecoder to convert Data into Player
+            guard let city = try? PropertyListDecoder().decode(City.self, from: cityData) else {
+                return
+            }
+            citiesArray.append(city)
+        }
+
+        self.citiesArray = citiesArray.reversed()
+        DispatchQueue.main.async {
+            if self.citiesArray.count > 0 {
+                self.citiesTableView.reloadData()
+            }
+        }
+    }
 }
 
 //MARK:- TableView Delegate & DataSource Methods
@@ -78,6 +151,7 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         selectedCity = citiesArray[indexPath.row]
+        self.appendNewCityToUserDefaultsArrayWith(city: selectedCity)
         self.performSegue(withIdentifier: "searchCityViewToCityWeatherViewSegue", sender: nil)
     }
     
@@ -104,7 +178,7 @@ extension CitySearchViewController : UISearchBarDelegate {
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        self.clearCitiesArray()
+        self.retriveCitiesDataFromUserDefaults()
     }
     
     fileprivate func clearCitiesArray() {
@@ -160,9 +234,6 @@ extension CitySearchViewController {
         }
         DispatchQueue.main.async {[unowned self] in
             self.citiesTableView.reloadData()
-            if self.citiesArray.count > 0 {
-                self.citiesTableView.isHidden = false
-            }
         }
     }
 }
