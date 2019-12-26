@@ -23,8 +23,8 @@ struct SearchAPI: Codable {
 }
 
 struct ListOfCities: Codable {
-    var citiesList : [City]?
-    
+    var citiesList: [City]?
+
     private enum CodingKeys: String, CodingKey {
         case citiesList = "result"
     }
@@ -41,7 +41,7 @@ struct City: Codable {
     var weatherUrl: [GenericModel]?
     var latitude: String?
     var longitude: String?
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -55,7 +55,7 @@ struct City: Codable {
 }
 
 struct GenericModel: Codable {
-    var value : String?
+    var value: String?
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         value = try container.decodeIfPresent(String.self, forKey: .value)

@@ -8,19 +8,19 @@
 
 import UIKit
 
-let CitiesUserDefaultsKey = "CitiesArrayKey"
+let kCitiesUserDefaultsKey = "CitiesArrayKey"
 
 class CitySearchViewController: UIViewController {
 
     @IBOutlet weak var citiesTableView: UITableView!
-    
+
     // This is used for searching for particular healthCenter from the list.
     let searchController = UISearchController(searchResultsController: nil)
     let connectionManagerInstance = ConnectionManager.sharedInstance
-    
+
     fileprivate var citiesArray = [City]()
     fileprivate var selectedCity: City!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpSearchController()
@@ -30,7 +30,7 @@ class CitySearchViewController: UIViewController {
         self.searchController.isActive = false
         self.retriveCitiesDataFromUserDefaults()
     }
-    
+
     private func setUpSearchController() {
         searchController.searchResultsUpdater = self as UISearchResultsUpdating
         searchController.searchBar.delegate = self as UISearchBarDelegate
@@ -44,32 +44,32 @@ class CitySearchViewController: UIViewController {
         definesPresentationContext = true
     }
 
-    private func appendNewCityToUserDefaultsArrayWith(city : City) {
-        var citiesDataArray = UserDefaults.standard.array(forKey: CitiesUserDefaultsKey) as? [Data]
+    private func appendNewCityToUserDefaultsArrayWith(city: City) {
+        var citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
         if citiesDataArray == nil {
-            let array : [Data] = []
+            let array: [Data] = []
             citiesDataArray = array
-            UserDefaults.standard.setValue(citiesDataArray, forKey: CitiesUserDefaultsKey)
+            UserDefaults.standard.setValue(citiesDataArray, forKey: kCitiesUserDefaultsKey)
         }
-        
+
         let defaults = UserDefaults.standard
         let data = try? PropertyListEncoder().encode(city)
         guard let cityData = data else { return }
-        
+
         let result = self.validateCityIsInUserDefaultsArrayWith(cityObj: city)
         if result.1, let cityIndex = result.0 {
             citiesDataArray?.remove(at: cityIndex)
         }
         if let count = citiesDataArray?.count, count >= 10 {
-            let _ = citiesDataArray?.remove(at: 0)
+            _ = citiesDataArray?.remove(at: 0)
         }
         citiesDataArray?.append(cityData)
-        defaults.setValue(citiesDataArray, forKey: CitiesUserDefaultsKey)
+        defaults.setValue(citiesDataArray, forKey: kCitiesUserDefaultsKey)
     }
 
-    private func validateCityIsInUserDefaultsArrayWith(cityObj : City) -> ( Int?, Bool) {
+    private func validateCityIsInUserDefaultsArrayWith(cityObj: City) -> ( Int?, Bool) {
         let defaults = UserDefaults.standard
-        let citiesDataArray = defaults.array(forKey: CitiesUserDefaultsKey) as? [Data]
+        let citiesDataArray = defaults.array(forKey: kCitiesUserDefaultsKey) as? [Data]
         guard let count = citiesDataArray?.count else { return (nil, false) }
         for index in 0..<count {
             let data = citiesDataArray?[index]
@@ -84,15 +84,15 @@ class CitySearchViewController: UIViewController {
         }
         return (nil, false)
     }
-    
+
     private func retriveCitiesDataFromUserDefaults() {
         var citiesArray = [City]()
         let defaults = UserDefaults.standard
-        var citiesDataArray = defaults.array(forKey: CitiesUserDefaultsKey) as? [Data]
+        var citiesDataArray = defaults.array(forKey: kCitiesUserDefaultsKey) as? [Data]
         if citiesDataArray == nil {
-            let array : [Data] = []
+            let array: [Data] = []
             citiesDataArray = array
-            defaults.setValue(citiesDataArray, forKey: CitiesUserDefaultsKey)
+            defaults.setValue(citiesDataArray, forKey: kCitiesUserDefaultsKey)
         }
         guard let count = citiesDataArray?.count else { return }
         for index in 0..<count {
@@ -114,9 +114,9 @@ class CitySearchViewController: UIViewController {
     }
 }
 
-//MARK:- TableView Delegate & DataSource Methods
-extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate {
-    
+// MARK: - TableView Delegate & DataSource Methods
+extension CitySearchViewController: UITableViewDataSource, UITableViewDelegate {
+
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -124,15 +124,15 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return citiesArray.count
     }
-        
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
-    
+
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
 
@@ -140,11 +140,11 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
             cell = UITableViewCell(style: UITableViewCell.CellStyle.default, reuseIdentifier: "Cell")
         }
         cell?.accessoryType = .disclosureIndicator
-        
+
         let city = citiesArray[indexPath.row]
         let cityName = city.areaName?[0].value ?? ""
         let country = city.country?[0].value ?? ""
-        
+
         cell!.textLabel?.text = "\(cityName), \(country)"
         return cell!
     }
@@ -154,7 +154,7 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
         self.appendNewCityToUserDefaultsArrayWith(city: selectedCity)
         self.performSegue(withIdentifier: "searchCityViewToCityWeatherViewSegue", sender: nil)
     }
-    
+
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -167,8 +167,8 @@ extension CitySearchViewController : UITableViewDataSource, UITableViewDelegate 
 
 }
 
-//MARK:- SerachBar Delegate Methods
-extension CitySearchViewController : UISearchBarDelegate {
+// MARK: - SerachBar Delegate Methods
+extension CitySearchViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.count > 2 {
             self.getListOfCitiesWith(searchText)
@@ -176,11 +176,11 @@ extension CitySearchViewController : UISearchBarDelegate {
             self.clearCitiesArray()
         }
     }
-    
+
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         self.retriveCitiesDataFromUserDefaults()
     }
-    
+
     fileprivate func clearCitiesArray() {
         DispatchQueue.main.async {
             self.citiesArray.removeAll()
@@ -192,20 +192,19 @@ extension CitySearchViewController : UISearchBarDelegate {
 // MARK: - UISearchResultsUpdating Delegate Method
 extension CitySearchViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        
+
     }
 }
 
 extension CitySearchViewController {
-        fileprivate func getListOfCitiesWith(_ searchText : String) {
+        fileprivate func getListOfCitiesWith(_ searchText: String) {
             guard let apiRequest =  connectionManagerInstance.getCitySearchApiRequestWith(searchText) else {
                 return
             }
 
             let defaultSession = URLSession(configuration: .default)
-            
-            let dataTask = defaultSession.dataTask(with: apiRequest)
-            { data, response , error in
+
+            let dataTask = defaultSession.dataTask(with: apiRequest) { data, response, error in
                 if (response as? HTTPURLResponse)?.statusCode == 200 {
                     guard let citiesData = data else { return }
                     do {
@@ -224,11 +223,11 @@ extension CitySearchViewController {
             }
             dataTask.resume()
         }
-    
-    fileprivate func parseCitiesWith(_ resultData : SearchAPI) {
+
+    fileprivate func parseCitiesWith(_ resultData: SearchAPI) {
         citiesArray.removeAll()
         let count = resultData.searchApi?.citiesList?.count ?? 0
-        for index in 0..<count   {
+        for index in 0..<count {
             let city = resultData.searchApi?.citiesList?[index]
             citiesArray.append(city!)
         }

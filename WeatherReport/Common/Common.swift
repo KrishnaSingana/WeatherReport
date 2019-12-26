@@ -11,9 +11,9 @@ import UIKit
 
 class Common {
     static let sharedCommonInstance = Common()
-    var activityIndicator : UIActivityIndicatorView!
+    var activityIndicator: UIActivityIndicatorView!
 
-    func showIndicatorViewOnScreen(viewController : UIViewController) {
+    func showIndicatorViewOnScreen(viewController: UIViewController) {
         DispatchQueue.main.async {
             if self.activityIndicator != nil {
                 self.activityIndicator = nil
@@ -28,8 +28,8 @@ class Common {
             viewController.view.isUserInteractionEnabled = false
         }
     }
-    
-    func hideIndicatorViewOnScreen(viewController : UIViewController) {
+
+    func hideIndicatorViewOnScreen(viewController: UIViewController) {
         DispatchQueue.main.async {
             self.activityIndicator.stopAnimating()
             self.activityIndicator.removeFromSuperview()
@@ -37,12 +37,12 @@ class Common {
             viewController.view.isUserInteractionEnabled = true
         }
     }
-    
-    func showAlertWith(_ title : String, _ message : String, onScreen viewController : UIViewController) {
+
+    func showAlertWith(_ title: String, _ message: String, onScreen viewController: UIViewController) {
         DispatchQueue.main.async {
             let errorAlert = UIAlertController(title: title, message: message, preferredStyle: .alert)
             let okAction = UIAlertAction(title: "Ok", style: .default) { (_) in
-                
+
             }
             errorAlert.addAction(okAction)
             viewController.present(errorAlert, animated: true)

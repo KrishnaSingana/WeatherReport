@@ -12,8 +12,8 @@ import MapKit
 class CityWeatherViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
-    
-    var selectedCity : City!
+
+    var selectedCity: City!
     fileprivate let regionRadius: CLLocationDistance = 60000
     fileprivate let connectionManagerInstance = ConnectionManager.sharedInstance
 
@@ -26,14 +26,14 @@ class CityWeatherViewController: UIViewController {
         self.centerMapOnLocation(location: initialLocationOnMap)
         mapView.delegate = self
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         guard let latitude = self.selectedCity.latitude, let longitude = self.selectedCity.longitude else {
             return
         }
         self.getCityWeatherDetailsFor(latitude, longitude)
     }
-    
+
     //  This method is used for showing complete singapore map on screen.
     fileprivate func centerMapOnLocation(location: CLLocation) {
         let coordinateRegion = MKCoordinateRegion(center: location.coordinate,
@@ -79,9 +79,9 @@ extension CityWeatherViewController {
     fileprivate func getCityWeatherDetailsFor(_ latitude: String, _ longitude: String) {
         Common.sharedCommonInstance.showIndicatorViewOnScreen(viewController: self)
         let defaultSession = URLSession(configuration: .default)
-        
-        let dataTask = defaultSession.dataTask(with:  connectionManagerInstance.getCityWeatherDetailsApiRequestFor(
-            latitude, longitude)!) { data, response , error in
+
+        let dataTask = defaultSession.dataTask(with: connectionManagerInstance.getCityWeatherDetailsApiRequestFor(
+            latitude, longitude)!) { data, response, error in
             if (response as? HTTPURLResponse)?.statusCode == 200 {
                 guard let weatherData = data else { return }
                 do {
@@ -101,15 +101,15 @@ extension CityWeatherViewController {
         }
         dataTask.resume()
     }
-    
-    fileprivate func parseWeatherDetails(_ weatherDetails : WeatherData) {
+
+    fileprivate func parseWeatherDetails(_ weatherDetails: WeatherData) {
         let currentWeather = weatherDetails.data?.currentCondition?[0]
         guard let weather = currentWeather else {
             return
         }
         self.createAnnotationFor(weather)
     }
-    
+
     //  This is used for creating Pin Annonations based on Location points that fetched from api.
     fileprivate func createAnnotationFor(_ currentWeather: CurrentWeather) {
         guard let imageURL = currentWeather.weatherIconUrl?[0].value else { return }
@@ -126,28 +126,23 @@ extension CityWeatherViewController {
     fileprivate func createAnnonationView(_ annonationObj: WeatherDetailsAnnonation) -> UIView {
         let annonationView = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
         annonationView.backgroundColor = UIColor(red: 227.0/255.0, green: 197.0/255.0, blue: 147.0/255.0, alpha: 1.0)
-        
+
         let titleMessage = "\(selectedCity?.areaName?[0].value ?? ""), \(selectedCity?.country?[0].value ?? "")"
 
-        let titleLbl = UILabel(frame: CGRect(x: 16, y: 4, width: 268, height: 30))
-        titleLbl.text = titleMessage
-        titleLbl.textAlignment = .center
-        titleLbl.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLbl.textColor = .black
+        let titleLbl = self.createLabelWith(CGRect(x: 16, y: 4, width: 268, height: 30),
+                                            text: titleMessage, font: UIFont.boldSystemFont(ofSize: 18),
+                                            textAllignment: .center)
         annonationView.addSubview(titleLbl)
-        
+
         let imageUrl = URL(string: annonationObj.currentWeatherImageUrl)
         let weatherImage = UIImageView(frame: CGRect(x: 80, y: 42, width: 140, height: 100))
         weatherImage.load(url: imageUrl!)
         weatherImage.backgroundColor = .clear
         annonationView.addSubview(weatherImage)
-        
-        let weatherNameLbl = UILabel(frame: CGRect(x: 16, y: 150, width: 268, height: 80))
-        weatherNameLbl.text = annonationObj.currentWeatherText
-        weatherNameLbl.textAlignment = .center
-        weatherNameLbl.font = UIFont.boldSystemFont(ofSize: 26)
-        weatherNameLbl.textColor = .black
-        weatherNameLbl.numberOfLines = 2
+
+        let weatherNameLbl = self.createLabelWith(CGRect(x: 16, y: 150, width: 268, height: 80),
+                                                  text: annonationObj.currentWeatherText,
+                                                  font: UIFont.boldSystemFont(ofSize: 26), textAllignment: .center)
         annonationView.addSubview(weatherNameLbl)
 
         let tempatureImage = UIImageView(frame: CGRect(x: 24, y: 230, width: 30, height: 30))
@@ -155,11 +150,9 @@ extension CityWeatherViewController {
         tempatureImage.backgroundColor = .clear
         annonationView.addSubview(tempatureImage)
 
-        let temperatureLbl = UILabel(frame: CGRect(x: 56, y: 230, width: 80, height: 30))
-        temperatureLbl.text = "\(annonationObj.currentTempC)°C"
-        temperatureLbl.textAlignment = .left
-        temperatureLbl.font = UIFont.systemFont(ofSize: 26)
-        temperatureLbl.textColor = .black
+        let temperatureLbl = self.createLabelWith(CGRect(x: 56, y: 230, width: 80, height: 30),
+                                                  text: "\(annonationObj.currentTempC)°C",
+                                                  font: UIFont.systemFont(ofSize: 26), textAllignment: .left)
         annonationView.addSubview(temperatureLbl)
 
         let humidityImage = UIImageView(frame: CGRect(x: 174, y: 230, width: 30, height: 30))
@@ -167,14 +160,23 @@ extension CityWeatherViewController {
         humidityImage.backgroundColor = .clear
         annonationView.addSubview(humidityImage)
 
-        let humidityLbl = UILabel(frame: CGRect(x: 210, y: 230, width: 80, height: 30))
-        humidityLbl.text = "\(annonationObj.currentHumudity)%"
-        humidityLbl.textAlignment = .left
-        humidityLbl.font = UIFont.systemFont(ofSize: 26)
-        humidityLbl.textColor = .black
+        let humidityLbl = self.createLabelWith(CGRect(x: 210, y: 230, width: 80, height: 30),
+                                               text: "\(annonationObj.currentHumudity)%",
+                                               font: UIFont.systemFont(ofSize: 26), textAllignment: .left)
         annonationView.addSubview(humidityLbl)
-        
+
         return annonationView
+    }
+
+    private func createLabelWith(_ rect: CGRect, text: String,
+                                 font: UIFont, textAllignment: NSTextAlignment) -> UILabel {
+        let lbl = UILabel(frame: rect)
+        lbl.text = text
+        lbl.textAlignment = textAllignment
+        lbl.font = font
+        lbl.textColor = .black
+        lbl.numberOfLines = 0
+        return lbl
     }
 }
 

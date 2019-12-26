@@ -10,7 +10,7 @@ import Foundation
 
 struct WeatherData: Codable {
     var data: WeatherDetails?
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         data = try container.decodeIfPresent(WeatherDetails.self, forKey: .data)
@@ -19,7 +19,7 @@ struct WeatherData: Codable {
 
 struct WeatherDetails: Codable {
     var currentCondition: [CurrentWeather]?
-    
+
     private enum CodingKeys: String, CodingKey {
         case currentCondition = "current_condition"
     }
@@ -36,7 +36,7 @@ struct CurrentWeather: Codable {
     var humidity: String?
     var tempC: String?
     var tempF: String?
-    
+
     private enum CodingKeys: String, CodingKey {
         case weatherIconUrl
         case weatherDesc
