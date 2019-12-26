@@ -11,24 +11,111 @@ import XCTest
 
 class WeatherReportTests: XCTestCase {
 
+    var citiesArray = [City]()
+
+    var citySearchVC: CitySearchViewController!
+
     override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let searchVC: CitySearchViewController = storyboard.instantiateViewController(withIdentifier:
+            String(describing: CitySearchViewController.self)) as! CitySearchViewController
+        citySearchVC = searchVC
+        _ = citySearchVC.view
+
+        //Clearing any cities data stored in UserDefaults
+        UserDefaults.standard.setValue([Data](), forKey: kCitiesUserDefaultsKey)
+        self.parseCitiesData()  //  Getting Cities list from json file
     }
 
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        //Clearing any cities data stored in UserDefaults
+        UserDefaults.standard.setValue([Data](), forKey: kCitiesUserDefaultsKey)
+        self.citiesArray.removeAll()
     }
 
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testAddingCityToUserDefaults() {
+        let cityObj = self.citiesArray[0]
+        //Getting Array of citiesData from UserDefaults
+        let citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertEqual(citiesDataArray?.count, 0)   //  As we cleared data in UserDefaults, count should be 0
+        citySearchVC.appendNewCityToUserDefaultsArrayWith(city: cityObj)  //  Appending new city object to UserDefaults
+        let citiesDataArray2 = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertEqual(citiesDataArray2?.count, 1)   // We added only one city to UserDefaults
     }
 
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func testCheckCityIsAlreadyPresentInUserDefaultsArray_CityNotPresentCase() {
+        let cityObj = self.citiesArray[0]
+        //Getting Array of citiesData from UserDefaults
+        let citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertEqual(citiesDataArray?.count, 0)   //  As we cleared data in UserDefaults, count should be 0
+
+        let result = citySearchVC.validateCityIsInUserDefaultsArrayWith(cityObj: cityObj)
+        XCTAssertFalse(result.1)    //  As we don't have this object in UserDefaults, it will return false
+    }
+
+    func testCheckCityIsAlreadyPresentInUserDefaultsArray_CityPresentCase() {
+        let cityObj = self.citiesArray[0]
+        //Getting Array of citiesData from UserDefaults
+        let citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertEqual(citiesDataArray?.count, 0)   //  As we cleared data in UserDefaults, count should be 0
+
+        let result = citySearchVC.validateCityIsInUserDefaultsArrayWith(cityObj: cityObj)
+        XCTAssertFalse(result.1)    //  As we don't have this city in UserDefaults, it will return false
+        //Appending cityObj to UserDefaults as it is not there
+        citySearchVC.appendNewCityToUserDefaultsArrayWith(city: cityObj)
+        //Will try to add same city again
+        let result2 = citySearchVC.validateCityIsInUserDefaultsArrayWith(cityObj: cityObj)
+        XCTAssertTrue(result2.1)    //  As this city is already present in UserDefaults, it will return true
+    }
+
+    func testRetrivingCitiesListFromUserDefaults() {
+        //Getting Array of citiesData from UserDefaults
+        let citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertEqual(citiesDataArray?.count, 0)   //  As we cleared data in UserDefaults, count should be 0
+
+        for city in self.citiesArray {
+            citySearchVC.appendNewCityToUserDefaultsArrayWith(city: city)
         }
+        //  As we have only 2 citis data in mock data, above code will saves 2 cities in UserDefaults
+        let citiesDataArray2 = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertEqual(citiesDataArray2?.count, 2)
+    }
+
+    func testAddingCityToUserDefaultsWhenDataInUserDefaultsIsNil() {
+        let cityObj = self.citiesArray[0]
+        //Storing nil in UserDefaults to check First time fetching Data from Userdefaults
+        UserDefaults.standard.setValue(nil, forKey: kCitiesUserDefaultsKey)
+        //Getting Array of citiesData from UserDefaults
+        let citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertNil(citiesDataArray)   //  As we cleared data in UserDefaults, count should be 0
+        citySearchVC.appendNewCityToUserDefaultsArrayWith(city: cityObj)  //  Appending new city object to UserDefaults
+        let citiesDataArray2 = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertEqual(citiesDataArray2?.count, 1)   // We added only one city to UserDefaults
+    }
+
+    // MARK: - Utility methods
+    fileprivate func parseCitiesData() {
+        if let mockCitiesData = self.getMockDataFromJsonFile(name: "CitySearchJson") {
+            do {
+                let citiesList = try JSONDecoder().decode(SearchAPI.self, from: mockCitiesData)
+                self.citiesArray = citySearchVC.parseCitiesWith(citiesList)
+            } catch {
+                print("JSON Data Parsing Error : \(error)")
+            }
+        }
+    }
+
+    internal func getMockDataFromJsonFile(name: String) -> Data? {
+        let testBundle = Bundle(for: type(of: self))
+        let url = testBundle.url(forResource: name, withExtension: "json")
+
+        do {
+            let data = try Data(contentsOf: url!)
+            return data
+        } catch {
+            //Handle Error
+        }
+        return nil
     }
 
 }
