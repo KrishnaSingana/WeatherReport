@@ -1,0 +1,56 @@
+{
+    "search_api": {
+        "result": [
+            {
+                "areaName": [
+                    {
+                        "value": "Delhi"
+                    }
+                ],
+                "country": [
+                    {
+                        "value": "India"
+                    }
+                ],
+                "region": [
+                    {
+                        "value": "Delhi"
+                    }
+                ],
+                "latitude": "28.667",
+                "longitude": "77.217",
+                "population": "10928270",
+                "weatherUrl": [
+                    {
+                        "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=28.6667,77.2167"
+                    }
+                ]
+            },
+            {
+                "areaName": [
+                    {
+                        "value": "Delhi"
+                    }
+                ],
+                "country": [
+                    {
+                        "value": "Canada"
+                    }
+                ],
+                "region": [
+                    {
+                        "value": "Ontario"
+                    }
+                ],
+                "latitude": "42.850",
+                "longitude": "-80.500",
+                "population": "4227",
+                "weatherUrl": [
+                    {
+                        "value": "https://www.worldweatheronline.com/v2/weather.aspx?q=42.85,-80.5"
+                    }
+                ]
+            }
+        ]
+    }
+}

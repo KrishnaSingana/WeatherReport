@@ -28,7 +28,7 @@ class CitySearchViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         self.searchController.isActive = false
-        self.retriveCitiesDataFromUserDefaults()
+        self.updateTableViewWithUserDefaultsCitiesData()
     }
 
     private func setUpSearchController() {
@@ -38,13 +38,13 @@ class CitySearchViewController: UIViewController {
         searchController.searchBar.searchTextField.font = UIFont.systemFont(ofSize: 14)
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self
-
+        searchController.searchBar.accessibilityIdentifier = "CitySearchBar"
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         definesPresentationContext = true
     }
 
-    private func appendNewCityToUserDefaultsArrayWith(city: City) {
+    internal func appendNewCityToUserDefaultsArrayWith(city: City) {
         var citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
         if citiesDataArray == nil {
             let array: [Data] = []
@@ -67,7 +67,7 @@ class CitySearchViewController: UIViewController {
         defaults.setValue(citiesDataArray, forKey: kCitiesUserDefaultsKey)
     }
 
-    private func validateCityIsInUserDefaultsArrayWith(cityObj: City) -> ( Int?, Bool) {
+    internal func validateCityIsInUserDefaultsArrayWith(cityObj: City) -> ( Int?, Bool) {
         let defaults = UserDefaults.standard
         let citiesDataArray = defaults.array(forKey: kCitiesUserDefaultsKey) as? [Data]
         guard let count = citiesDataArray?.count else { return (nil, false) }
@@ -85,7 +85,7 @@ class CitySearchViewController: UIViewController {
         return (nil, false)
     }
 
-    private func retriveCitiesDataFromUserDefaults() {
+    internal func retriveCitiesDataFromUserDefaults() -> [City] {
         var citiesArray = [City]()
         let defaults = UserDefaults.standard
         var citiesDataArray = defaults.array(forKey: kCitiesUserDefaultsKey) as? [Data]
@@ -94,18 +94,21 @@ class CitySearchViewController: UIViewController {
             citiesDataArray = array
             defaults.setValue(citiesDataArray, forKey: kCitiesUserDefaultsKey)
         }
-        guard let count = citiesDataArray?.count else { return }
+        guard let count = citiesDataArray?.count else { return citiesArray }
         for index in 0..<count {
             let data = citiesDataArray?[index]
-            guard let cityData = data else { return}
+            guard let cityData = data else { return citiesArray }
             // Use PropertyListDecoder to convert Data into Player
             guard let city = try? PropertyListDecoder().decode(City.self, from: cityData) else {
-                return
+                return citiesArray
             }
             citiesArray.append(city)
         }
-
-        self.citiesArray = citiesArray.reversed()
+        return citiesArray
+    }
+    
+    private func updateTableViewWithUserDefaultsCitiesData() {
+        self.citiesArray = self.retriveCitiesDataFromUserDefaults().reversed()
         DispatchQueue.main.async {
             if self.citiesArray.count > 0 {
                 self.citiesTableView.reloadData()
@@ -178,7 +181,7 @@ extension CitySearchViewController: UISearchBarDelegate {
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        self.retriveCitiesDataFromUserDefaults()
+        self.updateTableViewWithUserDefaultsCitiesData()
     }
 
     fileprivate func clearCitiesArray() {
@@ -197,42 +200,45 @@ extension CitySearchViewController: UISearchResultsUpdating {
 }
 
 extension CitySearchViewController {
-        fileprivate func getListOfCitiesWith(_ searchText: String) {
-            guard let apiRequest =  connectionManagerInstance.getCitySearchApiRequestWith(searchText) else {
-                return
-            }
+    fileprivate func getListOfCitiesWith(_ searchText: String) {
+        guard let apiRequest =  connectionManagerInstance.getCitySearchApiRequestWith(searchText) else {
+            return
+        }
 
-            let defaultSession = URLSession(configuration: .default)
+        let defaultSession = URLSession(configuration: .default)
 
-            let dataTask = defaultSession.dataTask(with: apiRequest) { data, response, error in
-                if (response as? HTTPURLResponse)?.statusCode == 200 {
-                    guard let citiesData = data else { return }
-                    do {
-                        let citiesList = try JSONDecoder().decode(SearchAPI.self, from: citiesData)
-                        self.parseCitiesWith(citiesList)
-                    } catch {
-                        print("JSON Data Parsing Error : \(error)")
+        let dataTask = defaultSession.dataTask(with: apiRequest) { data, response, error in
+            if (response as? HTTPURLResponse)?.statusCode == 200 {
+                guard let citiesData = data else { return }
+                do {
+                    let citiesList = try JSONDecoder().decode(SearchAPI.self, from: citiesData)
+                    self.citiesArray.removeAll()
+                    self.citiesArray = self.parseCitiesWith(citiesList)
+                    DispatchQueue.main.async {[unowned self] in
+                        self.citiesTableView.reloadData()
                     }
-                } else {
-                    DispatchQueue.main.async {
-                        self.searchController.searchBar.text = ""
-                        Common.sharedCommonInstance.showAlertWith("", "City not found. Search for different city.",
-                                                                  onScreen: self)
-                    }
+                } catch {
+                    print("JSON Data Parsing Error : \(error)")
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.searchController.searchBar.text = ""
+                    Common.sharedCommonInstance.showAlertWith("", "City not found. Search for different city.",
+                                                              onScreen: self)
                 }
             }
-            dataTask.resume()
         }
+        dataTask.resume()
+    }
 
-    fileprivate func parseCitiesWith(_ resultData: SearchAPI) {
-        citiesArray.removeAll()
+    internal func parseCitiesWith(_ resultData: SearchAPI) -> [City] {
+        var array = [City]()
         let count = resultData.searchApi?.citiesList?.count ?? 0
         for index in 0..<count {
-            let city = resultData.searchApi?.citiesList?[index]
-            citiesArray.append(city!)
+            if let city = resultData.searchApi?.citiesList?[index] {
+                array.append(city)
+            }
         }
-        DispatchQueue.main.async {[unowned self] in
-            self.citiesTableView.reloadData()
-        }
+        return array
     }
 }
