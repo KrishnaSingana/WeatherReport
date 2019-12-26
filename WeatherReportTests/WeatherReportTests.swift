@@ -12,14 +12,15 @@ import XCTest
 class WeatherReportTests: XCTestCase {
 
     var citiesArray = [City]()
-    
-    var citySearchVC : CitySearchViewController!
+
+    var citySearchVC: CitySearchViewController!
 
     override func setUp() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let searchVC: CitySearchViewController = storyboard.instantiateViewController(withIdentifier:
             String(describing: CitySearchViewController.self)) as! CitySearchViewController
         citySearchVC = searchVC
+        _ = citySearchVC.view
 
         //Clearing any cities data stored in UserDefaults
         UserDefaults.standard.setValue([Data](), forKey: kCitiesUserDefaultsKey)
@@ -47,20 +48,21 @@ class WeatherReportTests: XCTestCase {
         //Getting Array of citiesData from UserDefaults
         let citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
         XCTAssertEqual(citiesDataArray?.count, 0)   //  As we cleared data in UserDefaults, count should be 0
-       
+
         let result = citySearchVC.validateCityIsInUserDefaultsArrayWith(cityObj: cityObj)
         XCTAssertFalse(result.1)    //  As we don't have this object in UserDefaults, it will return false
     }
-    
+
     func testCheckCityIsAlreadyPresentInUserDefaultsArray_CityPresentCase() {
         let cityObj = self.citiesArray[0]
         //Getting Array of citiesData from UserDefaults
         let citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
         XCTAssertEqual(citiesDataArray?.count, 0)   //  As we cleared data in UserDefaults, count should be 0
-       
+
         let result = citySearchVC.validateCityIsInUserDefaultsArrayWith(cityObj: cityObj)
         XCTAssertFalse(result.1)    //  As we don't have this city in UserDefaults, it will return false
-        citySearchVC.appendNewCityToUserDefaultsArrayWith(city: cityObj)  //Appending cityObj to UserDefaults as it is not there
+        //Appending cityObj to UserDefaults as it is not there
+        citySearchVC.appendNewCityToUserDefaultsArrayWith(city: cityObj)
         //Will try to add same city again
         let result2 = citySearchVC.validateCityIsInUserDefaultsArrayWith(cityObj: cityObj)
         XCTAssertTrue(result2.1)    //  As this city is already present in UserDefaults, it will return true
@@ -78,9 +80,20 @@ class WeatherReportTests: XCTestCase {
         let citiesDataArray2 = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
         XCTAssertEqual(citiesDataArray2?.count, 2)
     }
-    
-    
-    //MARK:- Utility methods
+
+    func testAddingCityToUserDefaultsWhenDataInUserDefaultsIsNil() {
+        let cityObj = self.citiesArray[0]
+        //Storing nil in UserDefaults to check First time fetching Data from Userdefaults
+        UserDefaults.standard.setValue(nil, forKey: kCitiesUserDefaultsKey)
+        //Getting Array of citiesData from UserDefaults
+        let citiesDataArray = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertNil(citiesDataArray)   //  As we cleared data in UserDefaults, count should be 0
+        citySearchVC.appendNewCityToUserDefaultsArrayWith(city: cityObj)  //  Appending new city object to UserDefaults
+        let citiesDataArray2 = UserDefaults.standard.array(forKey: kCitiesUserDefaultsKey) as? [Data]
+        XCTAssertEqual(citiesDataArray2?.count, 1)   // We added only one city to UserDefaults
+    }
+
+    // MARK: - Utility methods
     fileprivate func parseCitiesData() {
         if let mockCitiesData = self.getMockDataFromJsonFile(name: "CitySearchJson") {
             do {
@@ -92,14 +105,14 @@ class WeatherReportTests: XCTestCase {
         }
     }
 
-    fileprivate func getMockDataFromJsonFile(name : String) -> Data? {
+    internal func getMockDataFromJsonFile(name: String) -> Data? {
         let testBundle = Bundle(for: type(of: self))
         let url = testBundle.url(forResource: name, withExtension: "json")
 
         do {
             let data = try Data(contentsOf: url!)
             return data
-        }catch {
+        } catch {
             //Handle Error
         }
         return nil

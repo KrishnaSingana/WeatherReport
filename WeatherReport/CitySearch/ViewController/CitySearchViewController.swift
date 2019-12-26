@@ -106,7 +106,7 @@ class CitySearchViewController: UIViewController {
         }
         return citiesArray
     }
-    
+
     private func updateTableViewWithUserDefaultsCitiesData() {
         self.citiesArray = self.retriveCitiesDataFromUserDefaults().reversed()
         DispatchQueue.main.async {

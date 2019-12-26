@@ -87,7 +87,9 @@ extension CityWeatherViewController {
                 do {
                     let weatherDetails = try JSONDecoder().decode(WeatherData.self, from: weatherData)
                     DispatchQueue.main.async {
-                        self.parseWeatherDetails(weatherDetails)
+                        let currentWeather = self.parseWeatherDetails(weatherDetails)
+                        guard let currentWeath = currentWeather else { return }
+                        self.createAnnotationFor(currentWeath)
                     }
                 } catch {
                     print("JSON Data Parsing Error : \(error)")
@@ -102,16 +104,16 @@ extension CityWeatherViewController {
         dataTask.resume()
     }
 
-    fileprivate func parseWeatherDetails(_ weatherDetails: WeatherData) {
+    internal func parseWeatherDetails(_ weatherDetails: WeatherData) -> CurrentWeather? {
         let currentWeather = weatherDetails.data?.currentCondition?[0]
         guard let weather = currentWeather else {
-            return
+            return nil
         }
-        self.createAnnotationFor(weather)
+        return weather
     }
 
     //  This is used for creating Pin Annonations based on Location points that fetched from api.
-    fileprivate func createAnnotationFor(_ currentWeather: CurrentWeather) {
+    internal func createAnnotationFor(_ currentWeather: CurrentWeather) {
         guard let imageURL = currentWeather.weatherIconUrl?[0].value else { return }
         guard let weatherText = currentWeather.weatherDesc?[0].value else { return }
         let weatherAnnotation = WeatherDetailsAnnonation(
@@ -123,7 +125,7 @@ extension CityWeatherViewController {
         self.mapView.selectAnnotation(weatherAnnotation, animated: true)
     }
 
-    fileprivate func createAnnonationView(_ annonationObj: WeatherDetailsAnnonation) -> UIView {
+    internal func createAnnonationView(_ annonationObj: WeatherDetailsAnnonation) -> UIView {
         let annonationView = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
         annonationView.backgroundColor = UIColor(red: 227.0/255.0, green: 197.0/255.0, blue: 147.0/255.0, alpha: 1.0)
 
