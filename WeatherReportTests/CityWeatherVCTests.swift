@@ -76,4 +76,39 @@ class CityWeatherVCTests: XCTestCase {
         return nil
     }
 
+    // MARK: - ConnectionManager Tests
+    func testGeneratingUrlRequestForCitySearchForCityNameHasSpaces() {
+        guard let searchApiRequest =  ConnectionManager.sharedInstance.getCitySearchApiRequestWith("Las Vegas") else {
+            XCTFail("UrlRequest not generated")
+            return
+        }
+        let urlAfterEncodingShouldBe
+            = "http://api.worldweatheronline.com/premium/v1/search.ashx?popular=yes&key=336c1ae9a81e44ec9de90335192012&format=json&q=Las%20Vegas"
+        let urlGenerated = searchApiRequest.url?.absoluteString
+        XCTAssertEqual(urlGenerated, urlAfterEncodingShouldBe)
+    }
+
+    func testGeneratingUrlRequestForCitySearchForCityNameHasNoSpaces() {
+        guard let serachApiRequest =  ConnectionManager.sharedInstance.getCitySearchApiRequestWith("Bangalo") else {
+           XCTFail("UrlRequest not generated")
+           return
+        }
+        let urlAfterEncodingShouldBe
+            = "http://api.worldweatheronline.com/premium/v1/search.ashx?popular=yes&key=336c1ae9a81e44ec9de90335192012&format=json&q=Bangalo"
+        let urlGenerated = serachApiRequest.url?.absoluteString
+        XCTAssertEqual(urlGenerated, urlAfterEncodingShouldBe)
+    }
+
+    func testGeneratingUrlRequestForCityWeatherDetails() {
+        guard let serachApiRequest =  ConnectionManager.sharedInstance
+            .getCityWeatherDetailsApiRequestFor("28.67", "77.22") else {
+           XCTFail("UrlRequest not generated")
+           return
+        }
+        let urlAfterEncodingShouldBe
+            = "http://api.worldweatheronline.com/premium/v1/weather.ashx?format=json&num_of_days=1&key=336c1ae9a81e44ec9de90335192012&q=28.67,77.22"
+        let urlGenerated = serachApiRequest.url?.absoluteString
+        XCTAssertEqual(urlGenerated, urlAfterEncodingShouldBe)
+    }
+
 }

@@ -131,18 +131,18 @@ extension CityWeatherViewController {
 
         let titleMessage = "\(selectedCity?.areaName?[0].value ?? ""), \(selectedCity?.country?[0].value ?? "")"
 
-        let titleLbl = self.createLabelWith(CGRect(x: 16, y: 4, width: 268, height: 30),
+        let titleLbl = self.createLabelWith(CGRect(x: 16, y: 4, width: 268, height: 50),
                                             text: titleMessage, font: UIFont.boldSystemFont(ofSize: 18),
                                             textAllignment: .center)
         annonationView.addSubview(titleLbl)
 
         let imageUrl = URL(string: annonationObj.currentWeatherImageUrl)
-        let weatherImage = UIImageView(frame: CGRect(x: 80, y: 42, width: 140, height: 100))
+        let weatherImage = UIImageView(frame: CGRect(x: 80, y: 56, width: 140, height: 100))
         weatherImage.load(url: imageUrl!)
         weatherImage.backgroundColor = .clear
         annonationView.addSubview(weatherImage)
 
-        let weatherNameLbl = self.createLabelWith(CGRect(x: 16, y: 150, width: 268, height: 80),
+        let weatherNameLbl = self.createLabelWith(CGRect(x: 16, y: 155, width: 268, height: 80),
                                                   text: annonationObj.currentWeatherText,
                                                   font: UIFont.boldSystemFont(ofSize: 26), textAllignment: .center)
         annonationView.addSubview(weatherNameLbl)
