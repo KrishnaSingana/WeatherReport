@@ -14,14 +14,16 @@ class ConnectionManager {
     static let sharedInstance = ConnectionManager()
     fileprivate let baseURL = "http://api.worldweatheronline.com/premium/v1/"
 
-    func generateCitySearchApiURLWith(_ searchText: String) -> String {
+    func generateCitySearchApiURLWith(_ searchText: String) -> String? {
         let endPointURL = "search.ashx?popular=yes&key=336c1ae9a81e44ec9de90335192012&format=json&q="
-        let hostURL = "\(baseURL)\(endPointURL)\(searchText)"
+        let hostURL = "\(baseURL)\(endPointURL)\(searchText)".addingPercentEncoding(
+            withAllowedCharacters: .urlQueryAllowed)
         return hostURL
     }
 
     func getCitySearchApiRequestWith(_ searchText: String) -> URLRequest? {
-        if let request: URLRequest = self.baseRequestForURL(url: self.generateCitySearchApiURLWith(searchText),
+        guard let url = self.generateCitySearchApiURLWith(searchText) else { return nil }
+        if let request: URLRequest = self.baseRequestForURL(url: url,
                                                            method: "GET") {
             return request
         }
